@@ -1,5 +1,5 @@
 // js/locales/zh-CN.js
-window.currentLocale = {
+window.i18n_zh_CN = {
   // 标题 (Cabeçalho)
   app_title: '🧠 通用有限自动机',
   app_subtitle: 'DFA / NFA',
