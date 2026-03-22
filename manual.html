@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual do Simulador de Autômatos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .manual-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #1e40af;
+            border-bottom: 2px solid #eef2ff;
+            padding-bottom: 8px;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+        }
+        p {
+            line-height: 1.5;
+            font-size: 1.05rem;
+        }
+        .exemplo {
+            background: #f8fafc;
+            border-left: 5px solid #2563eb;
+            padding: 12px 20px;
+            margin: 20px 0;
+            border-radius: 16px;
+        }
+        .dica {
+            background: #fef9c3;
+            border-left: 5px solid #eab308;
+            padding: 12px 20px;
+            border-radius: 16px;
+        }
+        .step {
+            background: #eef2ff;
+            margin: 12px 0;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+        }
+        button {
+            background: #e2e8f0;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="manual-container">
+    <h1>📘 Manual do Simulador de Autômatos</h1>
+    <p>Olá! Este manual vai te ajudar a entender o que é um autômato finito e como usar o nosso simulador. Não se preocupe se você nunca ouviu falar nisso antes – explicamos tudo passo a passo, como se fosse um jogo.</p>
+
+    <h2>🧠 O que é um autômato finito?</h2>
+    <p>Imagine uma máquina que lê uma sequência de letras (ou símbolos) e decide se ela é aceita ou não. Por exemplo, uma máquina que só aceita palavras que terminam com a letra "a".</p>
+    <p>O autômato finito é uma dessas máquinas. Ele tem:</p>
+    <ul>
+        <li><strong>Estados</strong>: são como "posições" ou "etapas" que a máquina pode estar.</li>
+        <li><strong>Transições</strong>: regras que dizem: "se você está no estado X e lê a letra Y, vai para o estado Z".</li>
+        <li><strong>Estado inicial</strong>: por onde a máquina começa.</li>
+        <li><strong>Estados finais</strong>: se a máquina terminar em um desses estados, a palavra é aceita.</li>
+    </ul>
+    <p>Existem dois tipos principais:</p>
+    <ul>
+        <li><strong>AFD (Autômato Finito Determinístico)</strong>: para cada estado e símbolo, há no máximo uma transição. É mais simples de simular.</li>
+        <li><strong>AFND (Autômato Finito Não Determinístico)</strong>: pode ter várias transições para o mesmo símbolo, ou até transições espontâneas (ε). É mais flexível.</li>
+    </ul>
+    <p>Nosso simulador reconhece automaticamente qual tipo você está criando e se adapta.</p>
+
+    <h2>🎮 Como usar o simulador</h2>
+    <p>A tela está dividida em duas partes:</p>
+    <ul>
+        <li><strong>Área do desenho (à esquerda)</strong>: onde você vê os estados (círculos) e as setas (transições). Você pode arrastar os círculos para organizar melhor.</li>
+        <li><strong>Painel de controle (à direita)</strong>: onde você cria estados, define transições e testa palavras.</li>
+    </ul>
+
+    <h2>✏️ Criando seu autômato</h2>
+    <div class="step">1. Adicionar estados</div>
+    <p>Clique no botão <strong>➕ Adicionar</strong>. Um novo círculo aparecerá. Você pode renomeá-lo clicando nele e digitando um novo nome no campo "Novo nome" e depois em "Renomear".</p>
+    <div class="step">2. Definir o estado inicial</div>
+    <p>Clique em um estado para selecioná-lo (ele fica com borda laranja). Depois clique em <strong>⭐ Inicial</strong>. Uma setinha aparecerá apontando para ele.</p>
+    <div class="step">3. Definir estados finais</div>
+    <p>Selecione um estado e clique em <strong>🔘 Alternar Final</strong>. O círculo ganha um contorno duplo. Se quiser tirar, clique novamente.</p>
+    <div class="step">4. Criar transições (as setas)</div>
+    <p>Nos campos abaixo de "Transições", escolha um estado de <strong>origem</strong> e um de <strong>destino</strong>. Digite um símbolo (letra, número ou até ε) e clique em <strong>Adicionar</strong>. Uma seta aparecerá no desenho.</p>
+    <p><strong>Importante:</strong> Se você criar mais de uma transição com o mesmo símbolo saindo do mesmo estado, o autômato vira não determinístico (AFND). O simulador detecta isso automaticamente e muda a simulação.</p>
+    <div class="dica">💡 Dica: para transições espontâneas (ε), use o botão <strong>ε (ε)</strong>. Elas não consomem símbolo.</div>
+
+    <h2>▶️ Testando uma palavra</h2>
+    <p>No painel "Simulação Visual", digite uma palavra (por exemplo, "aba") no campo e clique em <strong>Executar Automático</strong>. Você verá o autômato percorrendo os estados e, no final, será informado se a palavra foi ACEITA ou REJEITADA.</p>
+    <p>Se você quiser ver passo a passo, clique em <strong>Iniciar Passo a Passo</strong>. A cada clique em <strong>Próximo Símbolo</strong>, a máquina lê um caractere e mostra onde está. É ótimo para entender o funcionamento.</p>
+
+    <h2>🌐 Mudando o idioma</h2>
+    <p>No canto superior direito, há um seletor de idioma. Escolha entre Português, Inglês, Espanhol ou Chinês Simplificado. O simulador se adapta automaticamente.</p>
+
+    <h2>❓ Perguntas frequentes</h2>
+    <p><strong>Posso arrastar os estados?</strong><br>Sim! Clique em um círculo e arraste. Eles ficam onde você colocar, facilitando a visualização.</p>
+    <p><strong>O que significa o símbolo ε?</strong><br>É uma transição que não consome nenhum símbolo. É como se o autômato "pulase" para outro estado sem ler nada.</p>
+    <p><strong>Como apagar uma transição?</strong><br>Na lista de transições, ao lado de cada uma há um botão com ❌. Clique nele para remover.</p>
+    <p><strong>Como apagar um estado?</strong><br>Selecione o estado e clique em <strong>🗑️ Remover</strong>. Todas as transições que saem ou chegam nele também serão apagadas.</p>
+    <p><strong>Por que meu autômato ficou "Não Determinístico"?</strong><br>Se você criou duas transições diferentes com o mesmo símbolo saindo do mesmo estado, ou usou transições ε, ele se torna não determinístico. O simulador muda automaticamente a forma de simular.</p>
+
+    <h2>📚 Exemplo prático</h2>
+    <div class="exemplo">
+        <p><strong>Objetivo:</strong> Criar um autômato que aceite palavras que começam com "a" e terminam com "b".</p>
+        <ol>
+            <li>Crie dois estados: q0 e q1.</li>
+            <li>Defina q0 como inicial.</li>
+            <li>Defina q1 como final.</li>
+            <li>Crie transições:
+                <ul>
+                    <li>De q0 com "a" vai para q1</li>
+                    <li>De q1 com "b" vai para q1</li>
+                    <li>De q0 com "b" vai para q0 (para "matar" palavras que começam com b)</li>
+                </ul>
+            </li>
+            <li>Teste a palavra "ab" → deve ser aceita.</li>
+            <li>Teste "aab" → deve ser aceita.</li>
+            <li>Teste "ba" → deve ser rejeitada.</li>
+        </ol>
+        <p>Você pode construir isso facilmente no simulador e ver o resultado.</p>
+    </div>
+
+    <h2>✨ Dicas finais</h2>
+    <ul>
+        <li>Use o botão <strong>🔄 Organizar</strong> para distribuir os estados automaticamente em círculo.</li>
+        <li>Se quiser limpar todas as transições de uma vez, use o botão <strong>Limpar todas</strong>.</li>
+        <li>O modo passo a passo é ótimo para entender o caminho percorrido.</li>
+    </ul>
+
+    <footer>
+        <p>🔗 <a href="index.html">Voltar para o simulador</a></p>
+        <p>Desenvolvido para aprendizado de autômatos.</p>
+    </footer>
+</div>
+</body>
+</html>
