@@ -1,0 +1,73 @@
+// js/locales/zh-CN.js
+window.currentLocale = {
+  // 标题 (Cabeçalho)
+  app_title: '🧠 通用有限自动机',
+  app_subtitle: 'DFA / NFA',
+  type_badge: '⚙️ 确定性',
+  type_badge_det: '⚙️ 确定性 (DFA)',
+  type_badge_nondet: '🔀 非确定性 (NFA)',
+
+  // 状态 (Estados)
+  states_title: '📍 状态',
+  selected_none: '未选择任何状态',
+  add_state: '➕ 添加状态',
+  set_initial: '⭐ 设为初始',
+  toggle_final: '🔘 切换终态',
+  delete_state: '🗑️ 删除',
+  rename_placeholder: '新名称',
+  rename_btn: '✏️ 重命名',
+  selected_prefix: '已选择:',
+  initial_indicator: '⭐ 初始 | ',
+  final_yes: '🔵 终态',
+  final_no: '⚪ 非终态',
+
+  // 转移 (Transições)
+  transitions_title: '🔗 转移函数 (δ)',
+  add_transition: '添加',
+  epsilon_btn: 'ε (ε)',
+  clear_all: '清空所有',
+  transition_from: '(源状态)',
+  transition_to: '(目标状态)',
+  symbol_placeholder: '符号',
+  epsilon_symbol: 'ε',
+  no_transitions: '暂无转移',
+  transitions_hint: '🔹 允许同一符号有多条转移 (NFA)。 🔹 ε = 空转移。',
+
+  // 模拟 (Simulação)
+  simulation_title: '🎬 可视化模拟',
+  input_placeholder: '输入字符串 (例如: aabba)',
+  auto_run: '▶️ 自动执行',
+  step_init: '🔧 开始逐步执行',
+  step_next: '⏩ 下一个符号',
+  step_reset: '🔄 重置步骤',
+  step_inactive: '非活跃模式',
+  step_afd_prefix: '🔹 DFA - 步骤',
+  step_afnd_prefix: '🔹 NFA - 步骤',
+  step_of: '/',
+  step_state: '状态:',
+  step_states: '状态集:',
+  step_symbol_read: '读取符号:',
+  step_arrow: '→',
+  step_final: '终态',
+  step_nonfinal: '非终态',
+  result_accepted: '✅ 接受',
+  result_rejected: '❌ 拒绝',
+  error_no_word: '⚠️ 请输入字符串。',
+  error_no_initial: '❌ 自动机没有初始状态。',
+  error_no_transition: '❌ 错误：无法从',
+  error_undefined: '未定义的转移',
+  error_multiple: '检测到 NFA。是否使用逐步模式？',
+  final_set: '终态集:',
+  accept_reason_afd: '字符串被接受 (到达终态)。',
+  reject_reason_afd: '未到达终态。',
+  accept_reason_afnd: '字符串被接受 (至少一个终态可达)。',
+  reject_reason_afnd: '当前状态集中没有终态。',
+
+  // 通用操作 (Ações gerais)
+  arrange_btn: '🔄 自动排列',
+  drag_hint: '💡 拖动状态以重新定位',
+  confirm_clear: '删除所有转移？',
+  alert_select_state: '请先选择一个状态。',
+  alert_from_to: '请填写源状态和目标状态。',
+  alert_symbol: '请填写一个符号。'
+};
