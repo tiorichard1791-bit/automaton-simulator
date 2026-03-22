@@ -1,94 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!--
-    AFD/AFND Simulator - Copyright (C) 2025 Seu Nome
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
--->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AFD / AFND Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title data-i18n="app_title">Autômato Finito Universal</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container">
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <h1>
-            🧠 Autômato Finito Universal 
-            <small>AFD / AFND</small>
-            <span id="automaton-type-badge" class="automaton-type">⚙️ Determinístico</span>
+            <span data-i18n="app_title">🧠 Autômato Finito Universal</span>
+            <small data-i18n="app_subtitle">AFD / AFND</small>
+            <span id="automaton-type-badge" class="automaton-type" data-i18n="type_badge">⚙️ Determinístico</span>
         </h1>
+        <select id="lang-selector" style="padding: 6px 12px; border-radius: 40px; background: #f1f5f9; border: none; font-weight: 600;">
+            <option value="pt-BR">🇧🇷 Português</option>
+            <option value="en-US">🇺🇸 English</option>
+        </select>
+    </div>
 
-        <div class="flex-layout">
-            <!-- Área SVG -->
-            <div class="canvas-area">
-                <svg id="automaton-svg" viewBox="0 0 900 550"></svg>
-                <div class="canvas-footer">
-                    <span class="badge">💡 Arraste os estados para reposicionar</span>
-                    <button id="auto-arrange-btn" class="warning">🔄 Organizar</button>
+    <div class="flex-layout">
+        <!-- Área do SVG -->
+        <div class="canvas-area">
+            <svg id="automaton-svg" viewBox="0 0 900 550" style="min-height: 500px; width: 100%;"></svg>
+            <div style="display: flex; justify-content: space-between; padding: 10px;">
+                <span class="badge" data-i18n="drag_hint">💡 Arraste os estados para reposicionar</span>
+                <button id="auto-arrange-btn" class="warning" data-i18n="arrange_btn">🔄 Organizar</button>
+            </div>
+        </div>
+
+        <!-- Painéis laterais -->
+        <div class="control-panel">
+            <!-- Estados -->
+            <div class="card">
+                <h3 data-i18n="states_title">📍 Estados</h3>
+                <div id="selected-state-info" style="background:#eef2ff; padding:8px 12px; border-radius:32px; margin-bottom:12px;" data-i18n="selected_none">Nenhum selecionado</div>
+                <div class="btn-group">
+                    <button id="add-state-btn" class="primary" data-i18n="add_state">➕ Adicionar</button>
+                    <button id="set-initial-btn" class="warning" data-i18n="set_initial">⭐ Inicial</button>
+                    <button id="toggle-final-btn" data-i18n="toggle_final">🔘 Alternar Final</button>
+                    <button id="delete-state-btn" class="danger" data-i18n="delete_state">🗑️ Remover</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="rename-state-input" placeholder="Novo nome" data-i18n="rename_placeholder" style="flex:1;">
+                    <button id="rename-state-btn" data-i18n="rename_btn">✏️ Renomear</button>
                 </div>
             </div>
 
-            <!-- Painéis de controle -->
-            <div class="control-panel">
-                <!-- Estados -->
-                <div class="card">
-                    <h3>📍 Estados</h3>
-                    <div id="selected-state-info" class="selected-info"></div>
-                    <div class="btn-group">
-                        <button id="add-state-btn" class="primary">➕ Adicionar</button>
-                        <button id="set-initial-btn" class="warning">⭐ Inicial</button>
-                        <button id="toggle-final-btn">🔘 Alternar Final</button>
-                        <button id="delete-state-btn" class="danger">🗑️ Remover</button>
-                    </div>
-                    <div class="rename-group">
-                        <input type="text" id="rename-state-input" placeholder="Novo nome">
-                        <button id="rename-state-btn">✏️ Renomear</button>
-                    </div>
+            <!-- Transições -->
+            <div class="card">
+                <h3 data-i18n="transitions_title">🔗 Transições (δ)</h3>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                    <select id="transition-from" style="min-width:80px;">
+                        <option value="" data-i18n="transition_from">(origem)</option>
+                    </select>
+                    <input type="text" id="transition-symbol" placeholder="símbolo" maxlength="5" style="width:80px;" data-i18n="symbol_placeholder">
+                    <button id="add-epsilon-btn" class="epsilon-badge" data-i18n="epsilon_btn">ε (ε)</button>
+                    <select id="transition-to" style="min-width:80px;">
+                        <option value="" data-i18n="transition_to">(destino)</option>
+                    </select>
+                    <button id="add-transition-btn" class="primary" data-i18n="add_transition">Adicionar</button>
                 </div>
+                <div id="transitions-list" style="max-height: 180px; overflow-y: auto; margin-top: 12px;"></div>
+                <button id="clear-transitions-btn" class="danger" style="width:100%; margin-top:8px;" data-i18n="clear_all">Limpar todas</button>
+                <div style="font-size:0.7rem; margin-top:8px;" data-i18n="transitions_hint">🔹 Múltiplas transições com mesmo símbolo são permitidas (AFND). 🔹 ε = transição espontânea.</div>
+            </div>
 
-                <!-- Transições -->
-                <div class="card">
-                    <h3>🔗 Transições (δ)</h3>
-                    <div class="transition-form">
-                        <select id="transition-from"></select>
-                        <input type="text" id="transition-symbol" placeholder="símbolo" maxlength="5">
-                        <button id="add-epsilon-btn" class="epsilon-btn">ε</button>
-                        <select id="transition-to"></select>
-                        <button id="add-transition-btn" class="primary">Adicionar</button>
-                    </div>
-                    <div id="transitions-list" class="transitions-list"></div>
-                    <button id="clear-transitions-btn" class="danger full-width">🧹 Limpar todas</button>
-                    <div class="info-note">🔹 Múltiplas transições com mesmo símbolo são permitidas (AFND). 🔹 ε = transição espontânea.</div>
+            <!-- Simulação -->
+            <div class="card simulation-panel">
+                <h3 data-i18n="simulation_title">🎬 Simulação Visual</h3>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="simulation-string" placeholder="Cadeia de entrada (ex: aabba)" style="flex:3; font-family: monospace;" data-i18n="input_placeholder">
+                    <button id="visual-run-btn" class="primary" data-i18n="auto_run">▶️ Executar Automático</button>
                 </div>
-
-                <!-- Simulação -->
-                <div class="card simulation-panel">
-                    <h3>🎬 Simulação Visual</h3>
-                    <div class="simulation-input">
-                        <input type="text" id="simulation-string" placeholder="Cadeia de entrada (ex: aabba)">
-                        <button id="visual-run-btn" class="primary">▶️ Executar Automático</button>
-                    </div>
-                    <div class="sim-controls">
-                        <button id="step-init-btn" class="warning">🔧 Iniciar Passo a Passo</button>
-                        <button id="step-next-btn" class="success" disabled>⏩ Próximo Símbolo</button>
-                        <button id="step-reset-btn" class="danger" disabled>🔄 Reiniciar Passo</button>
-                    </div>
-                    <div id="step-status" class="step-indicator">Modo inativo</div>
-                    <div id="visual-result" class="result"></div>
+                <div class="sim-controls">
+                    <button id="step-init-btn" class="warning" data-i18n="step_init">🔧 Iniciar Passo a Passo</button>
+                    <button id="step-next-btn" class="success" disabled data-i18n="step_next">⏩ Próximo Símbolo</button>
+                    <button id="step-reset-btn" class="danger" disabled data-i18n="step_reset">🔄 Reiniciar Passo</button>
                 </div>
+                <div id="step-status" class="step-indicator" data-i18n="step_inactive">Modo inativo</div>
+                <div id="visual-result" class="result"></div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="js/script.js"></script>
+<script src="js/locales.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>

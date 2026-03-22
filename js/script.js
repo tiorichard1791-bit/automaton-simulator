@@ -1,23 +1,18 @@
 // js/script.js
 
 // ---------- ESTRUTURA DE DADOS AFND (universal) ----------
-let states = [];            // { id, name, x, y, final }
+let states = [];
 let initialStateId = null;
-// Transições: Map com chave "from|symbol" -> Set de ids de destino
 let transitionMap = new Map();
-
 let selectedStateId = null;
 let nextId = 2;
 
-// Controle para simulação passo a passo
 let stepModeActive = false;
 let stepString = "";
-let stepCurrentSet = new Set();   // conjunto de estados atuais (AFND)
-let stepCurrentStateId = null;    // estado atual (AFD)
+let stepCurrentSet = new Set();
+let stepCurrentStateId = null;
 let stepIndex = 0;
 let stepTotalSteps = 0;
-
-// Controle para animação automática
 let animationTimeout = null;
 
 const RADIUS = 32;
@@ -48,28 +43,26 @@ const stepResetBtn = document.getElementById("step-reset-btn");
 const stepStatusDiv = document.getElementById("step-status");
 const visualResultDiv = document.getElementById("visual-result");
 
+// ---------- UTILITÁRIOS DE TRADUÇÃO ----------
+const i18n = window.i18n;
+
 // ---------- FUNÇÕES AUXILIARES ----------
 function updateTypeBadge() {
     let isNondeterministic = false;
     for (let [key, destSet] of transitionMap.entries()) {
-        if (key.endsWith("|ε")) {
-            isNondeterministic = true;
-            break;
-        }
-        if (destSet.size > 1) {
-            isNondeterministic = true;
-            break;
-        }
+        if (key.endsWith("|ε")) { isNondeterministic = true; break; }
+        if (destSet.size > 1) { isNondeterministic = true; break; }
     }
-    automatonTypeBadge.textContent = isNondeterministic ? "🔀 Não Determinístico (AFND)" : "⚙️ Determinístico (AFD)";
+    const typeText = isNondeterministic ? i18n.get('type_badge_nondet') || '🔀 Não Determinístico (AFND)' : i18n.get('type_badge_det') || '⚙️ Determinístico (AFD)';
+    automatonTypeBadge.textContent = typeText;
     automatonTypeBadge.style.background = isNondeterministic ? "#fef9c3" : "#eef2ff";
     automatonTypeBadge.style.color = isNondeterministic ? "#854d0e" : "#2563eb";
 }
 
 function updateSelectors() {
     const options = states.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
-    transitionFromSelect.innerHTML = `<option value="">(origem)</option>${options}`;
-    transitionToSelect.innerHTML = `<option value="">(destino)</option>${options}`;
+    transitionFromSelect.innerHTML = `<option value="">${i18n.get('transition_from')}</option>${options}`;
+    transitionToSelect.innerHTML = `<option value="">${i18n.get('transition_to')}</option>${options}`;
 }
 
 function getAllTransitionsAsArray() {
@@ -86,7 +79,7 @@ function getAllTransitionsAsArray() {
 function updateTransitionsUI() {
     const allTrans = getAllTransitionsAsArray();
     if (allTrans.length === 0) {
-        transitionsListDiv.innerHTML = "<div style='text-align:center; padding:10px; color:gray'>Nenhuma transição</div>";
+        transitionsListDiv.innerHTML = `<div style='text-align:center; padding:10px; color:gray'>${i18n.get('no_transitions')}</div>`;
         return;
     }
     transitionsListDiv.innerHTML = allTrans.map((t, idx) => {
@@ -94,7 +87,7 @@ function updateTransitionsUI() {
         const toState = states.find(s => s.id === t.to);
         const fromName = fromState ? fromState.name : "?";
         const toName = toState ? toState.name : "?";
-        const symbolDisplay = t.symbol === "ε" ? "ε" : t.symbol;
+        const symbolDisplay = t.symbol === "ε" ? i18n.get('epsilon_symbol') : t.symbol;
         return `<div class="transition-row">
                     <span><strong>${fromName}</strong> —${symbolDisplay}→ <strong>${toName}</strong></span>
                     <button class="del-trans-btn" data-from="${t.from}" data-symbol="${t.symbol}" data-to="${t.to}" style="background:#fee2e2; padding:4px 10px;">❌</button>
@@ -126,7 +119,7 @@ function removeTransition(from, symbol, to) {
 
 function addTransition(from, symbol, to) {
     if (!from || !to) {
-        alert("Selecione origem e destino.");
+        alert(i18n.get('alert_from_to'));
         return false;
     }
     if (symbol === "") symbol = "ε";
@@ -146,7 +139,6 @@ function addTransition(from, symbol, to) {
 function removeState(stateId) {
     const idx = states.findIndex(s => s.id === stateId);
     if (idx === -1) return;
-    // Remove transições que envolvem este estado
     for (let [key, destSet] of transitionMap.entries()) {
         const [from, symbol] = key.split('|');
         if (from === stateId) {
@@ -256,36 +248,36 @@ function move(stateSet, symbol) {
 }
 
 function simulateAFND(inputString) {
-    if (!initialStateId) return { accepted: false, reason: "Sem estado inicial." };
+    if (!initialStateId) return { accepted: false, reason: i18n.get('error_no_initial') };
     let currentSet = epsilonClosure(new Set([initialStateId]));
     for (let i = 0; i < inputString.length; i++) {
         const ch = inputString[i];
         const nextSet = move(currentSet, ch);
         currentSet = epsilonClosure(nextSet);
         if (currentSet.size === 0) {
-            return { accepted: false, reason: `Sem transição para '${ch}' a partir dos estados ativos.` };
+            return { accepted: false, reason: `${i18n.get('error_undefined')} para '${ch}'.` };
         }
     }
     const accepted = Array.from(currentSet).some(id => states.find(s => s.id === id)?.final === true);
-    return { accepted, reason: accepted ? "Cadeia aceita (algum estado final alcançado)." : "Nenhum estado final no conjunto atual." };
+    return { accepted, reason: accepted ? i18n.get('accept_reason_afnd') : i18n.get('reject_reason_afnd') };
 }
 
 function simulateAFD(inputString) {
-    if (!initialStateId) return { accepted: false, reason: "Sem estado inicial." };
+    if (!initialStateId) return { accepted: false, reason: i18n.get('error_no_initial') };
     let current = initialStateId;
     for (let i = 0; i < inputString.length; i++) {
         const ch = inputString[i];
         const key = `${current}|${ch}`;
         if (!transitionMap.has(key) || transitionMap.get(key).size === 0) {
-            return { accepted: false, reason: `Transição indefinida de ${states.find(s=>s.id===current)?.name} com '${ch}'.` };
+            return { accepted: false, reason: `${i18n.get('error_undefined')} de ${states.find(s=>s.id===current)?.name} com '${ch}'.` };
         }
         if (transitionMap.get(key).size > 1) {
-            return { accepted: false, reason: `Não determinismo encontrado (múltiplos destinos).` };
+            return { accepted: false, reason: i18n.get('error_multiple') };
         }
         current = Array.from(transitionMap.get(key))[0];
     }
     const isFinal = states.find(s => s.id === current)?.final === true;
-    return { accepted: isFinal, reason: isFinal ? "Cadeia aceita (estado final)." : "Estado final não alcançado." };
+    return { accepted: isFinal, reason: isFinal ? i18n.get('accept_reason_afd') : i18n.get('reject_reason_afd') };
 }
 
 function isDeterministic() {
@@ -321,11 +313,11 @@ async function runVisualSimulation() {
     stopAnySimulation();
     const word = simulationStringInput.value.trim();
     if (!word) {
-        visualResultDiv.innerHTML = "<div class='result rejected'>⚠️ Digite uma cadeia.</div>";
+        visualResultDiv.innerHTML = `<div class="result rejected">⚠️ ${i18n.get('error_no_word')}</div>`;
         return;
     }
     if (!initialStateId || states.length === 0) {
-        visualResultDiv.innerHTML = "<div class='result rejected'>❌ Autômato sem estado inicial.</div>";
+        visualResultDiv.innerHTML = `<div class="result rejected">❌ ${i18n.get('error_no_initial')}</div>`;
         return;
     }
 
@@ -337,7 +329,7 @@ async function runVisualSimulation() {
             const ch = word[i];
             const key = `${current}|${ch}`;
             if (!transitionMap.has(key) || transitionMap.get(key).size === 0) {
-                visualResultDiv.innerHTML = `<div class='result rejected'>❌ Erro: sem transição de ${states.find(s=>s.id===current)?.name} com '${ch}'</div>`;
+                visualResultDiv.innerHTML = `<div class="result rejected">❌ ${i18n.get('error_no_transition')} ${states.find(s=>s.id===current)?.name} com '${ch}'</div>`;
                 return;
             }
             const next = Array.from(transitionMap.get(key))[0];
@@ -364,8 +356,8 @@ async function runVisualSimulation() {
                 highlightTransition = null;
                 updateSVG();
                 visualResultDiv.innerHTML = `<div class="result ${isAccepted ? 'accepted' : 'rejected'}">
-                    ${isAccepted ? '✅ ACEITA' : '❌ REJEITADA'} "${word}"<br>
-                    Último estado: ${states.find(s=>s.id===finalState)?.name} ${isAccepted ? '(final)' : '(não final)'}
+                    ${isAccepted ? i18n.get('result_accepted') : i18n.get('result_rejected')} "${word}"<br>
+                    ${i18n.get('step_state')} ${states.find(s=>s.id===finalState)?.name} ${isAccepted ? i18n.get('step_final') : i18n.get('step_nonfinal')}
                 </div>`;
                 resolve();
             }, steps.length * 800);
@@ -417,8 +409,8 @@ async function runVisualSimulation() {
         await new Promise(resolve => {
             setTimeout(() => {
                 visualResultDiv.innerHTML = `<div class="result ${isAccepted ? 'accepted' : 'rejected'}">
-                    ${isAccepted ? '✅ ACEITA' : '❌ REJEITADA'} "${word}"<br>
-                    Conjunto final: {${Array.from(finalSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}
+                    ${isAccepted ? i18n.get('result_accepted') : i18n.get('result_rejected')} "${word}"<br>
+                    ${i18n.get('final_set')} {${Array.from(finalSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}
                 </div>`;
                 resolve();
             }, steps.length * 1000);
@@ -438,11 +430,11 @@ function initStepByStep() {
     stopAnySimulation();
     const word = simulationStringInput.value.trim();
     if (!word) {
-        visualResultDiv.innerHTML = "<div class='result rejected'>⚠️ Digite uma cadeia para o passo a passo.</div>";
+        visualResultDiv.innerHTML = `<div class="result rejected">⚠️ ${i18n.get('error_no_word')}</div>`;
         return;
     }
     if (!initialStateId) {
-        visualResultDiv.innerHTML = "<div class='result rejected'>❌ Defina um estado inicial.</div>";
+        visualResultDiv.innerHTML = `<div class="result rejected">❌ ${i18n.get('error_no_initial')}</div>`;
         return;
     }
 
@@ -456,12 +448,12 @@ function initStepByStep() {
         stepCurrentStateId = initialStateId;
         highlightStateId = stepCurrentStateId;
         highlightStateSet = null;
-        stepStatusDiv.innerHTML = `🔹 AFD - Passo 0 / ${stepTotalSteps} | Estado: ${states.find(s=>s.id===stepCurrentStateId)?.name}`;
+        stepStatusDiv.innerHTML = `${i18n.get('step_afd_prefix')} 0 ${i18n.get('step_of')} ${stepTotalSteps} | ${i18n.get('step_state')} ${states.find(s=>s.id===stepCurrentStateId)?.name}`;
     } else {
         stepCurrentSet = epsilonClosure(new Set([initialStateId]));
         highlightStateSet = stepCurrentSet;
         highlightStateId = null;
-        stepStatusDiv.innerHTML = `🔹 AFND - Passo 0 / ${stepTotalSteps} | Estados: {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}`;
+        stepStatusDiv.innerHTML = `${i18n.get('step_afnd_prefix')} 0 ${i18n.get('step_of')} ${stepTotalSteps} | ${i18n.get('step_states')} {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}`;
     }
 
     stepNextBtn.disabled = false;
@@ -477,31 +469,31 @@ function stepNext() {
         if (stepIndex >= stepTotalSteps) {
             const isFinal = states.find(s => s.id === stepCurrentStateId)?.final === true;
             visualResultDiv.innerHTML = `<div class="result ${isFinal ? 'accepted' : 'rejected'}">
-                ${isFinal ? '✅ ACEITA' : '❌ REJEITADA'} "${stepString}"<br>
-                Estado final: ${states.find(s=>s.id===stepCurrentStateId)?.name} ${isFinal ? '(final)' : '(não final)'}
+                ${isFinal ? i18n.get('result_accepted') : i18n.get('result_rejected')} "${stepString}"<br>
+                ${i18n.get('step_state')} ${states.find(s=>s.id===stepCurrentStateId)?.name} ${isFinal ? i18n.get('step_final') : i18n.get('step_nonfinal')}
             </div>`;
             stepNextBtn.disabled = true;
             stepModeActive = false;
             highlightStateId = null;
             updateSVG();
-            stepStatusDiv.innerHTML = "Simulação concluída.";
+            stepStatusDiv.innerHTML = i18n.get('step_inactive');
             return;
         }
 
         const ch = stepString[stepIndex];
         const key = `${stepCurrentStateId}|${ch}`;
         if (!transitionMap.has(key) || transitionMap.get(key).size === 0) {
-            visualResultDiv.innerHTML = `<div class="result rejected">❌ Transição indefinida: ${states.find(s=>s.id===stepCurrentStateId)?.name} com '${ch}'</div>`;
+            visualResultDiv.innerHTML = `<div class="result rejected">❌ ${i18n.get('error_undefined')}: ${states.find(s=>s.id===stepCurrentStateId)?.name} com '${ch}'</div>`;
             stepModeActive = false;
             stepNextBtn.disabled = true;
             stepResetBtn.disabled = true;
             highlightStateId = null;
             updateSVG();
-            stepStatusDiv.innerHTML = "Erro - transição não encontrada.";
+            stepStatusDiv.innerHTML = i18n.get('step_inactive');
             return;
         }
         if (transitionMap.get(key).size > 1) {
-            visualResultDiv.innerHTML = `<div class="result rejected">❌ AFND detectado. Use modo passo a passo para AFND? (reinicie)</div>`;
+            visualResultDiv.innerHTML = `<div class="result rejected">❌ ${i18n.get('error_multiple')}</div>`;
             stepModeActive = false;
             stepNextBtn.disabled = true;
             stepResetBtn.disabled = true;
@@ -517,30 +509,30 @@ function stepNext() {
             highlightStateId = stepCurrentStateId;
             highlightTransition = null;
             updateSVG();
-            stepStatusDiv.innerHTML = `🔹 AFD - Passo ${stepIndex} / ${stepTotalSteps} | Símbolo '${ch}' → estado: ${states.find(s=>s.id===stepCurrentStateId)?.name}`;
+            stepStatusDiv.innerHTML = `${i18n.get('step_afd_prefix')} ${stepIndex} ${i18n.get('step_of')} ${stepTotalSteps} | ${i18n.get('step_symbol_read')} '${ch}' ${i18n.get('step_arrow')} ${i18n.get('step_state')} ${states.find(s=>s.id===stepCurrentStateId)?.name}`;
             if (stepIndex === stepTotalSteps) {
                 const isFinal = states.find(s => s.id === stepCurrentStateId)?.final === true;
                 visualResultDiv.innerHTML = `<div class="result ${isFinal ? 'accepted' : 'rejected'}">
-                    ${isFinal ? '✅ ACEITA' : '❌ REJEITADA'} "${stepString}"<br>
-                    Estado final: ${states.find(s=>s.id===stepCurrentStateId)?.name} ${isFinal ? '(final)' : '(não final)'}
+                    ${isFinal ? i18n.get('result_accepted') : i18n.get('result_rejected')} "${stepString}"<br>
+                    ${i18n.get('step_state')} ${states.find(s=>s.id===stepCurrentStateId)?.name} ${isFinal ? i18n.get('step_final') : i18n.get('step_nonfinal')}
                 </div>`;
                 stepNextBtn.disabled = true;
                 stepModeActive = false;
-                stepStatusDiv.innerHTML = "Fim da cadeia.";
+                stepStatusDiv.innerHTML = i18n.get('step_inactive');
             }
         }, 500);
     } else {
         if (stepIndex >= stepTotalSteps) {
             const isAccepted = Array.from(stepCurrentSet).some(id => states.find(s => s.id === id)?.final === true);
             visualResultDiv.innerHTML = `<div class="result ${isAccepted ? 'accepted' : 'rejected'}">
-                ${isAccepted ? '✅ ACEITA' : '❌ REJEITADA'} "${stepString}"<br>
-                Conjunto final: {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}
+                ${isAccepted ? i18n.get('result_accepted') : i18n.get('result_rejected')} "${stepString}"<br>
+                ${i18n.get('final_set')} {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}
             </div>`;
             stepNextBtn.disabled = true;
             stepModeActive = false;
             highlightStateSet = null;
             updateSVG();
-            stepStatusDiv.innerHTML = "Simulação concluída.";
+            stepStatusDiv.innerHTML = i18n.get('step_inactive');
             return;
         }
 
@@ -548,7 +540,7 @@ function stepNext() {
         const nextSet = move(stepCurrentSet, ch);
         const newSet = epsilonClosure(nextSet);
         if (newSet.size === 0) {
-            visualResultDiv.innerHTML = `<div class="result rejected">❌ Sem transição para '${ch}' a partir dos estados ativos.</div>`;
+            visualResultDiv.innerHTML = `<div class="result rejected">❌ ${i18n.get('error_undefined')} para '${ch}' a partir dos estados ativos.</div>`;
             stepModeActive = false;
             stepNextBtn.disabled = true;
             stepResetBtn.disabled = true;
@@ -573,16 +565,16 @@ function stepNext() {
             highlightStateSet = stepCurrentSet;
             highlightTransitionSet = null;
             updateSVG();
-            stepStatusDiv.innerHTML = `🔹 AFND - Passo ${stepIndex} / ${stepTotalSteps} | Símbolo '${ch}' → estados: {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}`;
+            stepStatusDiv.innerHTML = `${i18n.get('step_afnd_prefix')} ${stepIndex} ${i18n.get('step_of')} ${stepTotalSteps} | ${i18n.get('step_symbol_read')} '${ch}' ${i18n.get('step_arrow')} ${i18n.get('step_states')} {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}`;
             if (stepIndex === stepTotalSteps) {
                 const isAccepted = Array.from(stepCurrentSet).some(id => states.find(s => s.id === id)?.final === true);
                 visualResultDiv.innerHTML = `<div class="result ${isAccepted ? 'accepted' : 'rejected'}">
-                    ${isAccepted ? '✅ ACEITA' : '❌ REJEITADA'} "${stepString}"<br>
-                    Conjunto final: {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}
+                    ${isAccepted ? i18n.get('result_accepted') : i18n.get('result_rejected')} "${stepString}"<br>
+                    ${i18n.get('final_set')} {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}
                 </div>`;
                 stepNextBtn.disabled = true;
                 stepModeActive = false;
-                stepStatusDiv.innerHTML = "Fim da cadeia.";
+                stepStatusDiv.innerHTML = i18n.get('step_inactive');
             }
         }, 500);
     }
@@ -603,7 +595,7 @@ function stopAnySimulation() {
         stepModeActive = false;
         stepNextBtn.disabled = true;
         stepResetBtn.disabled = true;
-        stepStatusDiv.innerHTML = "Modo inativo";
+        stepStatusDiv.innerHTML = i18n.get('step_inactive');
     }
     highlightStateId = null;
     highlightStateSet = null;
@@ -692,7 +684,7 @@ function updateSVG() {
         path.setAttribute("marker-end", "url(#arrowhead)");
         svg.appendChild(path);
 
-        const labelText = edge.symbols.map(s => s === "ε" ? "ε" : s).join(",");
+        const labelText = edge.symbols.map(s => s === "ε" ? i18n.get('epsilon_symbol') : s).join(",");
         const textElem = document.createElementNS(SVG_NS, "text");
         textElem.setAttribute("x", midX);
         textElem.setAttribute("y", midY - 5);
@@ -809,36 +801,36 @@ function updateSelectedInfo() {
     if (selectedStateId) {
         const st = states.find(s => s.id === selectedStateId);
         if (st) {
-            const inicialMark = (initialStateId === st.id) ? "⭐ Inicial | " : "";
-            const finalMark = st.final ? "🔵 Final" : "⚪ Não final";
-            selectedInfoSpan.innerHTML = `Selecionado: <strong>${st.name}</strong> (${inicialMark}${finalMark})`;
+            const inicialMark = (initialStateId === st.id) ? i18n.get('initial_indicator') : "";
+            const finalMark = st.final ? i18n.get('final_yes') : i18n.get('final_no');
+            selectedInfoSpan.innerHTML = `${i18n.get('selected_prefix')} <strong>${st.name}</strong> (${inicialMark}${finalMark})`;
             renameStateInput.value = st.name;
             return;
         }
     }
-    selectedInfoSpan.innerHTML = "Nenhum estado selecionado";
+    selectedInfoSpan.innerHTML = i18n.get('selected_none');
     renameStateInput.value = "";
 }
 
 // ---------- EVENTOS ----------
 addStateBtn.onclick = () => addState();
-setInitialBtn.onclick = () => { if(selectedStateId) setInitial(selectedStateId); else alert("Selecione um estado."); };
-toggleFinalBtn.onclick = () => { if(selectedStateId) toggleFinal(selectedStateId); else alert("Selecione um estado."); };
+setInitialBtn.onclick = () => { if(selectedStateId) setInitial(selectedStateId); else alert(i18n.get('alert_select_state')); };
+toggleFinalBtn.onclick = () => { if(selectedStateId) toggleFinal(selectedStateId); else alert(i18n.get('alert_select_state')); };
 deleteStateBtn.onclick = () => { if(selectedStateId) removeState(selectedStateId); selectedStateId = null; updateSelectedInfo(); };
 renameStateBtn.onclick = () => { if(selectedStateId) renameState(selectedStateId, renameStateInput.value); };
-clearTransitionsBtn.onclick = () => { if(confirm("Remover todas as transições?")) { transitionMap.clear(); updateTransitionsUI(); updateSVG(); updateSelectors(); updateTypeBadge(); stopAnySimulation(); } };
+clearTransitionsBtn.onclick = () => { if(confirm(i18n.get('confirm_clear'))) { transitionMap.clear(); updateTransitionsUI(); updateSVG(); updateSelectors(); updateTypeBadge(); stopAnySimulation(); } };
 autoArrangeBtn.onclick = () => autoArrange();
 addEpsilonBtn.onclick = () => {
     const from = transitionFromSelect.value;
     const to = transitionToSelect.value;
-    if (!from || !to) alert("Selecione origem e destino.");
+    if (!from || !to) alert(i18n.get('alert_from_to'));
     else addTransition(from, "ε", to);
 };
 document.getElementById("add-transition-btn").onclick = () => {
     const from = transitionFromSelect.value;
     const to = transitionToSelect.value;
     let sym = document.getElementById("transition-symbol").value.trim();
-    if (!from || !to) alert("Preencha origem e destino.");
+    if (!from || !to) alert(i18n.get('alert_from_to'));
     else addTransition(from, sym, to);
 };
 visualRunBtn.onclick = () => runVisualSimulation();
@@ -866,3 +858,23 @@ function initExample() {
     updateTypeBadge();
 }
 initExample();
+
+// Escuta mudança de idioma para atualizar textos dinâmicos
+window.addEventListener('languageChanged', () => {
+    updateSelectors();    // atualiza os placeholders dos selects
+    updateTransitionsUI(); // atualiza a lista de transições (rótulos)
+    updateSelectedInfo();  // atualiza o painel de estado selecionado
+    updateTypeBadge();     // atualiza o badge de tipo
+    // Se houver simulação ativa, podemos reiniciar ou só atualizar status?
+    if (stepModeActive) {
+        // Atualiza o status sem perder o progresso
+        const deterministic = isDeterministic();
+        if (deterministic) {
+            stepStatusDiv.innerHTML = `${i18n.get('step_afd_prefix')} ${stepIndex} ${i18n.get('step_of')} ${stepTotalSteps} | ${i18n.get('step_state')} ${states.find(s=>s.id===stepCurrentStateId)?.name}`;
+        } else {
+            stepStatusDiv.innerHTML = `${i18n.get('step_afnd_prefix')} ${stepIndex} ${i18n.get('step_of')} ${stepTotalSteps} | ${i18n.get('step_states')} {${Array.from(stepCurrentSet).map(id=>states.find(s=>s.id===id)?.name).join(', ')}}`;
+        }
+    } else if (visualResultDiv.innerHTML !== "") {
+        // Se houver resultado antigo, melhor recriar? Simplesmente não mexemos para não perder.
+    }
+});
