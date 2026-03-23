@@ -709,6 +709,7 @@ function updateSVG() {
         circle.setAttribute("stroke", isHighlight ? "#ff8c00" : (selectedStateId === state.id ? "#f97316" : "#1e40af"));
         circle.setAttribute("stroke-width", isHighlight ? "4" : (selectedStateId === state.id ? "3.5" : "2"));
         circle.setAttribute("cursor", "pointer");
+        
         circle.addEventListener("click", (e) => {
             e.stopPropagation();
             selectedStateId = state.id;
@@ -876,5 +877,39 @@ window.addEventListener('languageChanged', () => {
         }
     } else if (visualResultDiv.innerHTML !== "") {
         // Se houver resultado antigo, melhor recriar? Simplesmente não mexemos para não perder.
+    }
+});
+
+// Adiciona um listener de clique no SVG para selecionar estados
+svg.addEventListener('click', (event) => {
+    // Obtém as coordenadas do clique relativas ao SVG
+    const pt = svg.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+    const cursor = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+    // Procura o estado mais próximo dentro do raio de seleção
+    let closestState = null;
+    let minDist = RADIUS + 5; // margem de 5 pixels
+    for (const state of states) {
+        const dx = cursor.x - state.x;
+        const dy = cursor.y - state.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < minDist) {
+            minDist = dist;
+            closestState = state;
+        }
+    }
+    if (closestState) {
+        // Seleciona o estado
+        selectedStateId = closestState.id;
+        updateSVG();          // redesenha com destaque
+        updateSelectedInfo(); // atualiza o painel direito
+        stopAnySimulation();  // cancela qualquer simulação em andamento
+    } else {
+        // Clique fora de qualquer estado: deseleciona
+        selectedStateId = null;
+        updateSVG();
+        updateSelectedInfo();
     }
 });
