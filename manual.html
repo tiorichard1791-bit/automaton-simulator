@@ -101,11 +101,42 @@
     <p>Nosso simulador reconhece automaticamente qual tipo você está criando e se adapta.</p>
 
     <h2>🎮 Como usar o simulador</h2>
-    <p>A tela está dividida em duas partes:</p>
+    <p>A tela está dividida em três partes principais:</p>
     <ul>
         <li><strong>Área do desenho (à esquerda)</strong>: onde você vê os estados (círculos) e as setas (transições). Você pode arrastar os círculos para organizar melhor.</li>
-        <li><strong>Painel de controle (à direita)</strong>: onde você cria estados, define transições e testa palavras.</li>
+        <li><strong>Painel de controle (centro)</strong>: onde você cria estados, define transições e testa palavras.</li>
+        <li><strong>Painel de alfabeto (direita)</strong>: onde você define e gerencia os símbolos que podem ser usados nas transições.</li>
     </ul>
+
+    <h2>📚 Gerenciamento de Alfabeto</h2>
+    <p>O alfabeto (Σ) é o conjunto de símbolos que seu autômato pode ler. Definir o alfabeto formalmente ajuda a garantir que todas as transições usem símbolos válidos e consistentes.</p>
+    
+    <div class="step">1. Definir o alfabeto</div>
+    <p>No painel "Alfabeto (Σ)", digite um símbolo (letra, número ou símbolo especial) e clique em <strong>Adicionar</strong>. Cada símbolo aparece como um "badge" colorido na lista.</p>
+    
+    <div class="step">2. Validação automática</div>
+    <p>O simulador valida cada símbolo em tempo real:</p>
+    <ul>
+        <li><strong>Comprimento:</strong> Máximo 3 caracteres</li>
+        <li><strong>Espaços:</strong> Não permitidos</li>
+        <li><strong>Caracteres especiais:</strong> Alguns como <, >, ", & são bloqueados</li>
+        <li><strong>Símbolo reservado:</strong> ε é reservado para transições epsilon</li>
+    </ul>
+    
+    <div class="step">3. Detecção do autômato</div>
+    <p>Clique em <strong>🔍 Detectar do Autômato</strong> para adicionar automaticamente todos os símbolos usados nas transições atuais. É útil quando você já criou transições e quer formalizar o alfabeto.</p>
+    
+    <div class="step">4. Consistência e validação</div>
+    <p>O painel de validação mostra em tempo real:</p>
+    <ul>
+        <li><strong>Símbolos faltantes:</strong> Usados no autômato mas não no alfabeto</li>
+        <li><strong>Símbolos não utilizados:</strong> No alfabeto mas não usados em transições</li>
+        <li><strong>Status:</strong> ✅ Válido ou ❌ Inválido com explicações</li>
+    </ul>
+    
+    <div class="dica">💡 Dica: Defina o alfabeto antes de criar transições para evitar símbolos inválidos. Use a detecção automática para verificar consistência.</div>
+    
+    <div class="dica">💡 Dica: Símbolos em uso (com transições) aparecem com fundo amarelo e não podem ser removidos até que as transições sejam apagadas.</div>
 
     <h2>✏️ Criando seu autômato</h2>
     <div class="step">1. Adicionar estados</div>
@@ -132,11 +163,20 @@
     <p><strong>Como apagar uma transição?</strong><br>Na lista de transições, ao lado de cada uma há um botão com ❌. Clique nele para remover.</p>
     <p><strong>Como apagar um estado?</strong><br>Selecione o estado e clique em <strong>🗑️ Remover</strong>. Todas as transições que saem ou chegam nele também serão apagadas.</p>
     <p><strong>Por que meu autômato ficou "Não Determinístico"?</strong><br>Se você criou duas transições diferentes com o mesmo símbolo saindo do mesmo estado, ou usou transições ε, ele se torna não determinístico. O simulador muda automaticamente a forma de simular.</p>
+    
+    <h3>📚 Perguntas sobre Alfabeto</h3>
+    <p><strong>Por que preciso definir um alfabeto?</strong><br>Definir o alfabeto formalmente ajuda a garantir que todas as transições usem símbolos válidos e consistentes. Também permite validação automática e detecção de erros.</p>
+    <p><strong>Quais símbolos são permitidos?</strong><br>Letras (a-z, A-Z), dígitos (0-9), símbolos especiais como +, *, #, @. Máximo 3 caracteres, sem espaços. O símbolo ε é reservado para transições epsilon.</p>
+    <p><strong>Por que não consigo remover um símbolo?</strong><br>Se um símbolo está em uso (aparece em alguma transição), ele fica com fundo amarelo e não pode ser removido. Apague primeiro as transições que usam esse símbolo.</p>
+    <p><strong>Como funciona a detecção automática?</strong><br>Clique em <strong>🔍 Detectar do Autômato</strong> para adicionar automaticamente todos os símbolos usados nas transições atuais ao alfabeto.</p>
+    <p><strong>O que significa "símbolos faltantes"?</strong><br>São símbolos usados em transições mas que não estão definidos no alfabeto. Adicione-os ao alfabeto para garantir consistência.</p>
+    <p><strong>O que significa "símbolos não utilizados"?</strong><br>São símbolos definidos no alfabeto mas que não aparecem em nenhuma transição. Você pode removê-los se não forem necessários.</p>
 
     <h2>📚 Exemplo prático</h2>
     <div class="exemplo">
         <p><strong>Objetivo:</strong> Criar um autômato que aceite palavras que começam com "a" e terminam com "b".</p>
         <ol>
+            <li><strong>Defina o alfabeto:</strong> No painel "Alfabeto (Σ)", adicione os símbolos "a" e "b".</li>
             <li>Crie dois estados: q0 e q1.</li>
             <li>Defina q0 como inicial.</li>
             <li>Defina q1 como final.</li>
@@ -147,10 +187,12 @@
                     <li>De q0 com "b" vai para q0 (para "matar" palavras que começam com b)</li>
                 </ul>
             </li>
+            <li><strong>Verifique consistência:</strong> O painel de validação deve mostrar "✅ Válido" pois todos os símbolos usados estão no alfabeto.</li>
             <li>Teste a palavra "ab" → deve ser aceita.</li>
             <li>Teste "aab" → deve ser aceita.</li>
             <li>Teste "ba" → deve ser rejeitada.</li>
         </ol>
+        <p><strong>Dica:</strong> Se você esquecer de definir o alfabeto, pode usar o botão <strong>🔍 Detectar do Autômato</strong> para adicionar automaticamente os símbolos "a" e "b" ao alfabeto.</p>
         <p>Você pode construir isso facilmente no simulador e ver o resultado.</p>
     </div>
 
@@ -159,6 +201,10 @@
         <li>Use o botão <strong>🔄 Organizar</strong> para distribuir os estados automaticamente em círculo.</li>
         <li>Se quiser limpar todas as transições de uma vez, use o botão <strong>Limpar todas</strong>.</li>
         <li>O modo passo a passo é ótimo para entender o caminho percorrido.</li>
+        <li><strong>Para alfabeto:</strong> Defina o alfabeto antes de criar transições para evitar símbolos inválidos.</li>
+        <li><strong>Para consistência:</strong> Use <strong>🔍 Detectar do Autômato</strong> para verificar se todos os símbolos usados estão no alfabeto.</li>
+        <li><strong>Para limpeza:</strong> Símbolos em uso (fundo amarelo) não podem ser removidos - apague as transições primeiro.</li>
+        <li><strong>Para validação:</strong> Sempre verifique o painel de validação do alfabeto para garantir consistência.</li>
     </ul>
 
     <footer>

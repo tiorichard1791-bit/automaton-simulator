@@ -18,6 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title data-i18n="app_title">Autômato Finito Universal</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/alphabet.css">
 </head>
 <body>
 <div class="container">
@@ -47,6 +48,29 @@
 
         <!-- Painéis laterais -->
         <div class="control-panel">
+            <!-- Painel de Alfabeto -->
+            <div id="alphabet-panel" class="card">
+                <h3>📚 Alfabeto (Σ)</h3>
+                <div id="alphabet-status">
+                    <span>Σ = { }</span>
+                    <span class="badge">0 símbolos</span>
+                </div>
+                <div class="alphabet-input-group">
+                    <input type="text" id="alphabet-input" placeholder="Digite um símbolo (ex: a, 0, +)" maxlength="3">
+                    <button id="add-symbol-btn" class="primary">Adicionar</button>
+                </div>
+                <div id="alphabet-list" class="empty"></div>
+                <div class="alphabet-action-buttons">
+                    <button id="auto-detect-btn" class="warning">🔍 Detectar do Autômato</button>
+                    <button id="clear-alphabet-btn" class="danger">🗑️ Limpar Alfabeto</button>
+                </div>
+                <div id="alphabet-validation">
+                    <h4>Validação do Alfabeto</h4>
+                    <div id="validation-status">
+                        <div class="success">Nenhum problema detectado</div>
+                    </div>
+                </div>
+            </div>
             <!-- Estados -->
             <div class="card">
                 <h3 data-i18n="states_title">📍 Estados</h3>
@@ -107,5 +131,8 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/script.js"></script>
+<script src="js/alphabet/alphabet.js"></script>
+<script src="js/alphabet/alphabet-validation.js"></script>
+<script src="js/alphabet/alphabet-ui.js"></script>
 </body>
 </html>
