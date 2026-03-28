@@ -1,0 +1,511 @@
+/**
+ * Estilos para o painel de gerenciamento de alfabeto
+ */
+
+/* Painel principal do alfabeto */
+#alphabet-panel {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+#alphabet-panel:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+#alphabet-panel h3 {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#alphabet-panel h3::before {
+  content: "📚";
+  font-size: 1.5rem;
+}
+
+/* Status do alfabeto */
+#alphabet-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-family: 'Courier New', monospace;
+}
+
+#alphabet-status span:first-child {
+  color: #334155;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+#alphabet-status .badge {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Grupo de entrada */
+.alphabet-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#alphabet-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #1e293b;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+#alphabet-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+#alphabet-input::placeholder {
+  color: #94a3b8;
+}
+
+#add-symbol-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+#add-symbol-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+}
+
+#add-symbol-btn:active {
+  transform: translateY(0);
+}
+
+#add-symbol-btn::before {
+  content: "+";
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Lista de símbolos */
+#alphabet-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+  min-height: 44px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+}
+
+#alphabet-list.empty::after {
+  content: "Nenhum símbolo adicionado";
+  color: #94a3b8;
+  font-style: italic;
+  width: 100%;
+  text-align: center;
+  padding: 8px;
+}
+
+.symbol-item {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  border: 2px solid #0ea5e9;
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.symbol-item .symbol-text {
+  color: #0369a1;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+}
+
+.symbol-item .remove-btn {
+  background: #fecaca;
+  color: #dc2626;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.symbol-item .remove-btn:hover {
+  background: #fca5a5;
+  transform: scale(1.1);
+}
+
+.symbol-item .remove-btn:active {
+  transform: scale(0.95);
+}
+
+/* Botões de ação */
+.alphabet-action-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+#auto-detect-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #78350f;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#auto-detect-btn:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+}
+
+#auto-detect-btn::before {
+  content: "🔍";
+}
+
+#clear-alphabet-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#clear-alphabet-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+}
+
+#clear-alphabet-btn::before {
+  content: "🗑️";
+}
+
+/* Painel de validação */
+#alphabet-validation {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+#alphabet-validation.valid {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+
+#alphabet-validation.invalid {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+#alphabet-validation h4 {
+  color: #92400e;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#alphabet-validation.valid h4 {
+  color: #065f46;
+}
+
+#alphabet-validation.invalid h4 {
+  color: #991b1b;
+}
+
+#alphabet-validation h4::before {
+  content: "✓";
+  font-size: 1.2rem;
+}
+
+#alphabet-validation.valid h4::before {
+  content: "✅";
+}
+
+#alphabet-validation.invalid h4::before {
+  content: "❌";
+}
+
+#validation-status {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+#validation-status .error {
+  color: #dc2626;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+#validation-status .error::before {
+  content: "✗";
+  font-size: 0.9rem;
+}
+
+#validation-status .warning {
+  color: #d97706;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+#validation-status .warning::before {
+  content: "⚠";
+  font-size: 0.9rem;
+}
+
+#validation-status .success {
+  color: #059669;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+#validation-status .success::before {
+  content: "✓";
+  font-size: 0.9rem;
+}
+
+/* Tooltips e mensagens */
+.alphabet-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.alphabet-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #1e293b;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.alphabet-tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+}
+
+.alphabet-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Mensagens de feedback */
+.alphabet-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  z-index: 10000;
+  animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.alphabet-message.success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.alphabet-message.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.alphabet-message.warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  #alphabet-panel {
+    padding: 16px;
+  }
+  
+  .alphabet-input-group {
+    flex-direction: column;
+  }
+  
+  #add-symbol-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .alphabet-action-buttons {
+    flex-direction: column;
+  }
+  
+  .symbol-item {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Estados desabilitados */
+#alphabet-input:disabled,
+#add-symbol-btn:disabled,
+#auto-detect-btn:disabled,
+#clear-alphabet-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Highlight para símbolos em uso */
+.symbol-item.in-use {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+}
+
+.symbol-item.in-use .symbol-text {
+  color: #92400e;
+}
+
+.symbol-item.in-use .remove-btn {
+  background: #fde68a;
+  color: #92400e;
+  cursor: not-allowed;
+}
+
+.symbol-item.in-use .remove-btn:hover {
+  background: #fde68a;
+  transform: none;
+}
+
+/* Indicador de símbolo novo */
+.symbol-item.new {
+  animation: pulse 1s ease;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+  }
+  50% {
+    box-shadow: 0 2px 20px rgba(14, 165, 233, 0.4);
+  }
+}
